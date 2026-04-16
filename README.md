@@ -1,5 +1,5 @@
 # infer_platform-rknn
-一个模型推理加速平台。目前支持Hailo计算卡、RKNN、cpu。
+一个模型推理加速平台。目前支持Hailo计算卡、RKNN、cpu、npu。
 ## 运行
 ### 前提条件
  - 你需要一台rtsp视频流服务器
@@ -9,8 +9,19 @@
 ### 使用方式
 直接运行app.py文件即可
 详细调用方式可以参考APIFoxUrl:https://apifox.com/apidoc/shared-55aa7f92-ff27-4258-b624-f3a6f6c26eab
+### API接口
+- **获取节点信息**: `/device/nodeInfo` (GET)
+- **开启视频流任务**: `/device/startStream` (POST)
+  - 参数: `modelFile`, `rtspUrl`, `waringUrl`, `resRtspUrl`
+- **停止视频流任务**: `/device/stopStream` (GET)
+- **下载模型文件**: `/device/downloadModel` (POST)
+  - 参数: `hostname`, `port`, `username`, `password`, `remotePath`, `localFilename`
+- **列出所有模型文件**: `/device/listModels` (GET)
+- **删除指定模型文件**: `/device/deleteModel` (DELETE)
+  - 参数: `filename`
 ## 架构图
-![架构图](./imgs/架构图.png)
+<img width="341" height="408" alt="架构图" src="https://github.com/user-attachments/assets/5a1d80a2-62ea-444c-8236-d12382e8c902" />
+
 ## 使用注意事项
  - modelsZoo中存放的是不同类型的模型对应的推理代码。models存放的是模型对应的权重文件。
 比如，如果我使用的是yolov5s的onnx库推理，这时需要在app.py文件中修改modelType的类型
@@ -18,6 +29,7 @@
 当运行推理时，系统会单独为imgStreamInfer函数起一个线程去运行推理内容。所以当我们需要
 开发一个新的类型的模型时，我们需要新建一个这样的py文件在modelsZoo中，之后
 编写一个imgStreamInfer函数来执行逻辑。
+ - 使用npu推理时需要一台拥有npu的板子（例如rk3588)。
  - imgStreamInfer函数的定义时，需要model_path, rtsp_url, waring_url, res_rtsp_url, event
 这几项参数，其中model_path参数你可以据此来载入这个模型的权重，rtsp_url用于
 为你提供输入视频流的地址，waring_url用于触发你的报警信息后，你进行通知的地址。
